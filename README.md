@@ -12,7 +12,7 @@ Jung Chess is a simple chess game implemented in Python using the Pygame library
 1. **Clone the repository:**
 
     ```
-    git clone https://github.com/your-username/jung-chess.git
+    git clone https://github.com/jungleo2001/jung_chess.git
     ```
 
 2. **Install the required dependencies:**
@@ -50,7 +50,7 @@ Jung Chess é um jogo de xadrez simples implementado em Python usando a bibliote
 1. **Clone o repositório:**
 
     ```
-    git clone https://github.com/your-username/jung-chess.git
+    git clone https://github.com/jungleo2001/jung_chess.git
     ```
 
 2. **Instale as dependências necessárias:**
