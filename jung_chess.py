@@ -2,7 +2,6 @@ import chess
 import chess.engine
 import pygame
 import os
-import threading
 
 # Initialize pygame
 pygame.init()
@@ -20,31 +19,7 @@ for piece in ['bR', 'bK', 'bN', 'bP', 'bQ', 'bB', 'wR', 'wK', 'wN', 'wP', 'wQ', 
     piece_images[piece] = pygame.image.load(os.path.join('images', piece + '.png'))
 
 # Load Stockfish engine
-engine = chess.engine.SimpleEngine.popen_uci("stockfish/Stockfish/src/stockfish")
-
-# Piece classes
-class Piece:
-    def __init__(self, color):
-        self.color = color
-
-    def move(self, start_square, end_square):
-        pass  # Implement move logic for each piece type
-
-class Pawn(Piece):
-    def __init__(self, color):
-        super().__init__(color)
-
-    def move(self, start_square, end_square):
-        pass  # Implement move logic for pawns
-
-class Rook(Piece):
-    def __init__(self, color):
-        super().__init__(color)
-
-    def move(self, start_square, end_square):
-        pass  # Implement move logic for rooks
-
-# Other piece classes (Knight, Bishop, Queen, King) follow a similar structure...
+engine = chess.engine.SimpleEngine.popen_uci("/home/dexhex/stockfish/stockfish")
 
 # Draw the chessboard
 def draw_board():
@@ -93,7 +68,7 @@ def main():
 
     # Menu toggle
     font = pygame.font.Font(None, 36)
-    menu_text = font.render("Press 'C' to switch mode (Human vs. Human)", True, (255, 255, 255))
+    menu_text = font.render("Press 'C' to switch mode (Human vs. Human)", True, (0, 255, 0))
     menu_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT - 30))
 
     while running and not board.is_game_over():
@@ -120,6 +95,12 @@ def main():
                 # Check if the target square is a valid move for the selected piece
                 if any(move.to_square == target_square for move in valid_moves):
                     board.push(chess.Move(selected_piece, target_square))
+                    selected_piece = None
+                    valid_moves = []
+
+                    # If playing against the CPU, make its move
+                    if not human_vs_human and not board.is_game_over() and board.turn == chess.BLACK:
+                        make_engine_move(board)
 
                 selected_piece = None
                 valid_moves = []
@@ -127,10 +108,7 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
                     human_vs_human = not human_vs_human
-
-        # If playing against the CPU, make its move
-        if not human_vs_human and not board.is_game_over():
-            threading.Thread(target=make_engine_move, args=(board.copy(),)).start()
+                    menu_text = font.render(f"Mode: {'Human vs. Human' if human_vs_human else 'Human vs. CPU'}", True, (0, 255, 0))
 
         # Draw the board and pieces
         draw_board()
@@ -138,6 +116,10 @@ def main():
         screen.blit(menu_text, menu_rect)
 
         pygame.display.flip()
+
+        # If playing against the CPU, make its move outside event loop
+        if not human_vs_human and board.turn == chess.BLACK and not board.is_game_over():
+            make_engine_move(board)
 
     pygame.quit()
     engine.quit()
